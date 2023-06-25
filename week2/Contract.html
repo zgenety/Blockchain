@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script src='node_modules/web3/dist/web3.min.js'></script>
+</head>
+
+<body>
+
+    Web3 Calculator
+    <form>
+    <input id="FN" type="text" value="2" /> FirstNumber<br />
+    <input id="OP" type="text" value="+" /> Choose operation (+, *, -, /)<br />
+    <input id="SN" type="text" value="2" /> SecondNumber<br />
+    </form>
+    <button onclick="Calculate()">Submit</button>
+    <span id="result"></span>
+
+    <script type="text/javascript">
+	async function loadWeb3() {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                window.ethereum.enable();
+            }
+        }
+
+        async function loadContract() {
+            return await new window.web3.eth.Contract([[
+	{
+		"inputs": [
+			{
+				"internalType": "uint64",
+				"name": "Number",
+				"type": "uint64"
+			}
+		],
+		"name": "SetFirstNumber",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "oper",
+				"type": "string"
+			}
+		],
+		"name": "SetOperation",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint64",
+				"name": "Number",
+				"type": "uint64"
+			}
+		],
+		"name": "SetSecondNumber",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "Calculation",
+		"outputs": [
+			{
+				"internalType": "uint128",
+				"name": "",
+				"type": "uint128"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "FirstNumber",
+		"outputs": [
+			{
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "Operation",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "SecondNumber",
+		"outputs": [
+			{
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+], '0xdd08800a3994595Fb17989fF8eA2d1C13C82432E');
+        }
+
+        function updateResult(result) {
+            const res = document.getElementById('result');
+            res.innerHTML = result;
+            console.log(result);
+        }
+
+        async function Calculate() {
+        var F = parseInt(document.getElementById("FN").value);
+        var O = document.getElementById("OP").value;
+        var S = parseInt(document.getElementById("SN").value);
+
+        await window.contract.methods.SetFirstNumber(F).call();
+        await window.contract.methods.SetOperation(O).call();
+        await window.contract.methods.SetSecondNumber(S).call();
+
+        const result = await window.contract.methods.Calculation().call();
+
+        updateResult(`Result: ${result}`);
+        }
+
+        async function load() {
+            updateResult('Not ready to calculate!');
+            await loadWeb3();
+            window.contract = await loadContract();
+            updateResult('Ready to calculate!');
+        }
+
+        load();
+    </script>
+</body>
+
+</html>
